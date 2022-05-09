@@ -1,5 +1,4 @@
 #!/bin/bash
-
 cd contracts/circuits
 
 mkdir HelloWorld

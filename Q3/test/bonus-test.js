@@ -35,6 +35,9 @@ describe("SystemOfEquations", function () {
 
     it("Should return true for correct proof", async function () {
         //[assignment] Add comments to explain what each line is doing
+        
+        // Generate witness based on input
+        // and generate proof and public Signals from witness 
         const { proof, publicSignals } = await groth16.fullProve({
             "x": ["15","17","19"],
             "A": [["1","1","1"],["1","2","3"],["2","-1","1"]],
@@ -42,8 +45,11 @@ describe("SystemOfEquations", function () {
         },
             "contracts/bonus/SystemOfEquations/SystemOfEquations_js/SystemOfEquations.wasm","contracts/bonus/SystemOfEquations/circuit_final.zkey");
 
+        // Parse and clean publicSignals and proof
         const editedPublicSignals = unstringifyBigInts(publicSignals);
         const editedProof = unstringifyBigInts(proof);
+        
+        // Export call parameters for verifier smart contract based on proof and publicSignals
         const calldata = await groth16.exportSolidityCallData(editedProof, editedPublicSignals);
     
         const argv = calldata.replace(/["[\]\s]/g, "").split(',').map(x => BigInt(x).toString());
@@ -53,13 +59,16 @@ describe("SystemOfEquations", function () {
         const c = [argv[6], argv[7]];
         const Input = argv.slice(8);
 
+        // Make a call to the smart contract and verify result
         expect(await verifier.verifyProof(a, b, c, Input)).to.be.true;
     });
     it("Should return false for invalid proof", async function () {
+        // Create dummy values
         let a = [0, 0];
         let b = [[0, 0], [0, 0]];
         let c = [0, 0];
         let d = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // Make a call to the smart contract and verify result
         expect(await verifier.verifyProof(a, b, c, d)).to.be.false;
     });
 });

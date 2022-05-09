@@ -9,9 +9,15 @@ template Multiplier3 () {
    signal input b;
    signal input c;
    signal output d;  
+   signal inter;
 
+   inter <== a * b;
    // Constraints.  
-   d <== a * b * c;  
+   d <== inter * c; 
+
+   // How did I solve it?
+   // I made use of an intermediate signal to avoid triggering the quadratic limit exception
+    
 }
 
 component main = Multiplier3();
